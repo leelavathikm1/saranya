@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form action="">
+      <label for="fname">First Name : </label>
+      <input type="text" name="" id="fname" onkeyup="checkValue()" />
+      <br />
+      <label for="gender">Gender</label>
+      <input type="radio" name="gender" value="male" />Male
+      <input type="radio" name="gender" value="female" />Female
+      <br />
+
+      <label for="subject">Subjects</label> <br />
+      <input type="checkbox" name="subject" value="html" />HTML <br />
+      <input type="checkbox" name="subject" value="css" />CSS <br />
+      <input type="checkbox" name="subject" value="javascript" />JavaScript
+      <br />
+      <input type="checkbox" name="subject" value="angular" />Angular <br />
+      <input type="checkbox" name="subject" value="react" />React
+      <br />
+
+      <label for="countries">Countries</label><br />
+      <select name="countries" id="countries">
+        <option value="America">America</option>
+        <option value="india">India</option>
+        <option value="newzeland">Newzeland</option>
+        <option value="italy">Italy</option>
+      </select>
+
+      <button type="button" disabled onclick="addUser()">Add User</button>
+    </form>
+
+    <table border="1">
+      <thead>
+        <th>First Name</th>
+        <th>Gender</th>
+        <th>Subjects</th>
+        <th>Country</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </thead>
+      <tbody id="myTable"></tbody>
+    </table>
+    <div id="myDiv"></div>
+    <script>
+      var users = [];
+      var rButtons = document.getElementsByName("gender");
+      var allCheckBoxes = document.getElementsByName("subject");
+
+      function checkValue() {
+        var fName = document.getElementById("fname").value;
+        if (fName.length >= 6) {
+          document.querySelector("button").removeAttribute("disabled");
+        } else {
+          document.querySelector("button").setAttribute("disabled", true);
+        }
+      }
+
+      function addUser() {
+        var person = {
+          fname: "",
+          gender: "",
+        };
+        person.fname = document.getElementById("fname").value;
+
+        for (i = 0; i < rButtons.length; i++) {
+          if (rButtons[i].checked == true) {
+            person.gender = rButtons[i].value;
+          }
+        }
+
+        var checkedValues = [];
+        allCheckBoxes.forEach(function (check) {
+          if (check.checked == true) {
+            checkedValues.push(check.value);
+          }
+        });
+        person.subjects = checkedValues;
+
+        person.countries = document.getElementById("countries").value;
+        users.push(person);
+        resetValues(person);
+        displayUsersAsTable();
+        // displayNormal();
+      }
+
+      function displayUsersAsTable() {
+        document.getElementById("myTable").innerHTML = "";
+        for (i = 0; i < users.length; i++) {
+          var myTr = document.createElement("tr");
+          for (a in users[i]) {
+            var myTd = document.createElement("td");
+            myTd.innerHTML = users[i][a];
+            myTr.appendChild(myTd);
+          }
+
+          var editTd = document.createElement("td");
+          var editBtn = document.createElement("button");
+          editBtn.innerHTML = "Edit";
+          editBtn.setAttribute("onclick", "editUser(" + i + ")");
+          editTd.appendChild(editBtn);
+          myTr.appendChild(editTd);
+
+          var deleteTd = document.createElement("td");
+          var delteBtn = document.createElement("button");
+          delteBtn.innerHTML = "Delete";
+          delteBtn.setAttribute("onclick", "deleteUser(" + i + ")");
+          deleteTd.appendChild(delteBtn);
+          myTr.appendChild(deleteTd);
+          document.getElementById("myTable").appendChild(myTr);
+        }
+      }
+
+      function editUser(i) {
+        resetValues(users[i]);
+        var selectedUser = users[i];
+        for (a in selectedUser) {
+          if (a == "fname" || a == "countries") {
+            document.getElementById(a).value = selectedUser[a];
+          } else if (a == "gender") {
+            rButtons.forEach((rbtn) => {
+              if (selectedUser.gender == rbtn.value) {
+                rbtn.checked = true;
+              }
+            });
+          } else {
+            allCheckBoxes.forEach((checkBox) => {
+              selectedUser.subjects.forEach((sub) => {
+                if (checkBox.value == sub) {
+                  checkBox.checked = true;
+                }
+              });
+            });
+          }
+        }
+      }
+
+      function deleteUser(i) {
+        users.splice(i, 1);
+        displayUsersAsTable();
+      }
+      function displayNormal() {
+        document.getElementById("myDiv").innerHTML = "";
+        var results = "";
+        users.forEach(function (user) {
+          for (a in user) {
+            results = results + user[a] + "<br>";
+          }
+
+          results = results + "<br>";
+        });
+        document.getElementById("myDiv").innerHTML = results;
+      }
+
+      function resetValues(person) {
+        for (a in person) {
+          if (a == "fname" || a == "countries") {
+            document.getElementById(a).value = "";
+          } else if (a == "gender") {
+            rButtons.forEach((rbutton) => {
+              rbutton.checked = false;
+            });
+          } else if (a == "subjects") {
+            allCheckBoxes.forEach(function (checkbox) {
+              checkbox.checked = false;
+            });
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
